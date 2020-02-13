@@ -476,14 +476,18 @@ public class TestWriteJsonResult {
     @Test
     public void testChoiceArray() throws IOException {
         final List<RecordField> fields = new ArrayList<>();
+        fields.add(new RecordField("name", RecordFieldType.STRING.getDataType()));
         fields.add(new RecordField("path", RecordFieldType.CHOICE.getChoiceDataType(RecordFieldType.ARRAY.getArrayDataType(RecordFieldType.STRING.getDataType()))));
         final RecordSchema schema = new SimpleRecordSchema(fields);
 
         Object[] paths = new Object[1];
+        Object[] name = new Object[2];
         paths[0] = "10.2.1.3";
+        name[0] = "john wick";
 
         final Map<String, Object> values = new HashMap<>();
         values.put("path", paths);
+        values.put("name", name);
         final Record record = new MapRecord(schema, values);
 
         final ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -496,7 +500,7 @@ public class TestWriteJsonResult {
 
         final byte[] data = baos.toByteArray();
 
-        final String expected = "[{\"path\":[\"10.2.1.3\"]}]";
+        final String expected = "[{\"name\":\"john wick\",\"path\":[\"10.2.1.3\"]}]";
 
         final String output = new String(data, StandardCharsets.UTF_8);
         assertEquals(expected, output);
