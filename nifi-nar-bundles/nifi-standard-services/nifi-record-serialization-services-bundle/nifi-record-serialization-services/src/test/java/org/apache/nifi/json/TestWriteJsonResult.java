@@ -476,6 +476,34 @@ public class TestWriteJsonResult {
     @Test
     public void testChoiceArray() throws IOException {
         final List<RecordField> fields = new ArrayList<>();
+        fields.add(new RecordField("path", RecordFieldType.CHOICE.getChoiceDataType(RecordFieldType.ARRAY.getArrayDataType(RecordFieldType.STRING.getDataType()))));
+        final RecordSchema schema = new SimpleRecordSchema(fields);
+
+        Object[] paths = new Object[1];
+        paths[0] = "10.2.1.3";
+
+        final Map<String, Object> values = new HashMap<>();
+        values.put("path", paths);
+        final Record record = new MapRecord(schema, values);
+
+        final ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        try (final WriteJsonResult writer = new WriteJsonResult(Mockito.mock(ComponentLog.class), schema, new SchemaNameAsAttribute(), baos, false,
+                NullSuppression.NEVER_SUPPRESS, OutputGrouping.OUTPUT_ARRAY, null, null, null)) {
+            writer.beginRecordSet();
+            writer.writeRecord(record);
+            writer.finishRecordSet();
+        }
+
+        final byte[] data = baos.toByteArray();
+
+        final String expected = "[{\"path\":[\"10.2.1.3\"]}]";
+
+        final String output = new String(data, StandardCharsets.UTF_8);
+        assertEquals(expected, output);
+    }
+    @Test
+    public void testChoiceArray1() throws IOException {
+        final List<RecordField> fields = new ArrayList<>();
         fields.add(new RecordField("name", RecordFieldType.STRING.getDataType()));
         fields.add(new RecordField("path", RecordFieldType.CHOICE.getChoiceDataType(RecordFieldType.ARRAY.getArrayDataType(RecordFieldType.STRING.getDataType()))));
         final RecordSchema schema = new SimpleRecordSchema(fields);
@@ -484,6 +512,7 @@ public class TestWriteJsonResult {
         Object[] name = new Object[2];
         paths[0] = "10.2.1.3";
         name[0] = "john wick";
+        name[1] = 1;
 
         final Map<String, Object> values = new HashMap<>();
         values.put("path", paths);
@@ -500,8 +529,7 @@ public class TestWriteJsonResult {
 
         final byte[] data = baos.toByteArray();
 
-        final String expected = "[{\"name\":\"john wick\",\"path\":[\"10.2.1.3\"]}]";
-
+        final String expected = "[{\"name\":\"john wick 1 \",\"path\":[\"10.2.1.3\"]}]";
         final String output = new String(data, StandardCharsets.UTF_8);
         assertEquals(expected, output);
     }

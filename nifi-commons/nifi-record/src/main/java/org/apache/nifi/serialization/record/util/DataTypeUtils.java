@@ -841,6 +841,15 @@ public class DataTypeUtils {
         if (value instanceof Object[]) {
             Object[] o = (Object[]) value;
             if (o.length > 0) {
+                if(o[0].getClass().getName() == "java.lang.String") {
+                    StringBuilder sb = new StringBuilder();
+                    for (Object strOb : o) {
+                        if (strOb != null) {
+                            sb.append(strOb+" ");
+                        }
+                    }
+                    return sb.toString();
+                }
 
                 byte[] dest = new byte[o.length];
                 for (int i = 0; i < o.length; i++) {
